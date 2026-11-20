@@ -42,11 +42,14 @@ src/test/java
 
 ## Запуск
 
-Требования: JDK 17+, Maven, Google Chrome.
+Требования: JDK 17+, Maven, Google Chrome. Драйвер браузера нужной версии Selenium скачивает сам.
 
 ```bash
 # запустить все тесты
 mvn clean test
+
+# без окна браузера — так тесты идут в CI (GitHub Actions, каждый push и раз в сутки)
+HEADLESS=1 mvn clean test
 
 # открыть Allure-отчёт в браузере
 mvn allure:serve

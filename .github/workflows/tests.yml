@@ -1,0 +1,45 @@
+# UI-тесты SauceDemo на каждый push, PR и раз в сутки: сайт чужой, его могут поменять в любой день.
+name: UI tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "40 3 * * *" # каждый день в 08:40 по Астане
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Скачать код
+        uses: actions/checkout@v7
+
+      - name: Установить Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Запустить тесты
+        env:
+          HEADLESS: "1"
+        run: mvn -B test
+
+      - name: Собрать Allure-отчёт
+        if: always()
+        run: mvn -B allure:report
+
+      - name: Сохранить отчёт
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-report
+          path: target/site/allure-maven-plugin
+          retention-days: 14

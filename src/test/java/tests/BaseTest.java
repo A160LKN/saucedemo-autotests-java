@@ -34,8 +34,17 @@ public abstract class BaseTest {
                 "profile.password_manager_leak_detection", false
         ));
 
+        // Запуск без окна браузера: HEADLESS=1 mvn test. Так тесты идут в CI (GitHub Actions), где экрана нет;
+        // драйвер Chrome нужной версии скачивает Selenium Manager — хранить chromedriver в проекте не нужно
+        boolean headless = "1".equals(System.getenv("HEADLESS"));
+        if (headless) {
+            options.addArguments("--headless=new", "--window-size=1280,900", "--no-sandbox", "--disable-dev-shm-usage");
+        }
+
         driver = new ChromeDriver(options);
-        driver.manage().window().maximize();
+        if (!headless) {
+            driver.manage().window().maximize();
+        }
     }
 
     @AfterEach
